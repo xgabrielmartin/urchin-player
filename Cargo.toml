@@ -1,0 +1,62 @@
+[package]
+name = "urchin-player"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.89"
+description = "A cross-platform, folder-first music player for the terminal, built in Rust"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/xgabrielmartin/urchin-player"
+exclude = ["/player.png", "/player2.png", "/urchin.svg", "/docs"]
+keywords = ["music", "player", "audio", "terminal", "tui"]
+categories = ["command-line-utilities", "multimedia::audio"]
+build = "build.rs"
+
+[[bin]]
+name = "urchin"
+path = "src/main.rs"
+
+[features]
+default = []
+ffmpeg = ["dep:ffmpeg-next"]
+tracker = []
+chiptune = []
+full = ["ffmpeg", "tracker", "chiptune"]
+
+[dependencies]
+ratatui = "0.30"
+crossterm = "0.29"
+cpal = "0.18"
+symphonia = { version = "0.6", features = ["all"] }
+symphonia-metadata = { version = "0.6", default-features = false, features = ["riff-info"] }
+ffmpeg-next = { version = "9", optional = true, default-features = false, features = ["codec", "format", "software-resampling"] }
+rubato = "5"
+realfft = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+dirs = "7"
+natord = "1"
+anyhow = "1"
+unicode-width = "0.2"
+unicode-normalization = "0.1"
+
+[target.'cfg(unix)'.dependencies]
+signal-hook = "0.4"
+libc = "0.2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+souvlaki = "0.9"
+core-foundation = "0.10"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+souvlaki = { version = "0.9", default-features = false, features = ["use_zbus"] }
+
+[target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
+zbus = "6"
+
+[build-dependencies]
+pkg-config = "0.3"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
